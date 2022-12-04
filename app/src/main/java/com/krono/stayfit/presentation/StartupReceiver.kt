@@ -5,18 +5,29 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.health.services.client.HealthServices
+import androidx.hilt.work.HiltWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 
+/**
+ * Background data subscriptions are not persisted across device restarts. This receiver checks if
+ * we enabled background data and, if so, registers again.
+ */
+@AndroidEntryPoint
 class StartupReceiver : BroadcastReceiver() {
 
-    lateinit var repository: PassiveDataRepository
+    @Inject lateinit var repository: PassiveDataRepository
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
@@ -27,7 +38,7 @@ class StartupReceiver : BroadcastReceiver() {
 
                 if (sensorEnabled == PackageManager.PERMISSION_GRANTED) {
 
-                    // TODO: check permissions for startup receiver first.
+                    // TODO: check more permissions for startup receiver first.
                     Log.d(PASSIVE_DATA_TAG, "Enqueuing worker")
                     WorkManager.getInstance(context).enqueue(
                         OneTimeWorkRequestBuilder<RegisterForPassiveDataWorker>().build()
@@ -45,10 +56,12 @@ class StartupReceiver : BroadcastReceiver() {
     }
 }
 
-class RegisterForPassiveDataWorker(
-    private val appContext: Context,
-    private val healthServicesManager: HealthServicesManager,
-    workerParams: WorkerParameters
+
+@HiltWorker
+class RegisterForPassiveDataWorker @AssistedInject constructor(
+    @Assisted private val appContext: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val healthServicesManager: HealthServicesManager
 ) : Worker(appContext, workerParams) {
 
     override fun doWork(): Result {

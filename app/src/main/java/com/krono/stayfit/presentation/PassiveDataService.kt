@@ -4,13 +4,16 @@ import android.util.Log
 import androidx.health.services.client.PassiveListenerService
 import androidx.health.services.client.data.DataPointContainer
 import androidx.health.services.client.data.DataType
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 
-//@AndroidEntryPoint
+@AndroidEntryPoint
 class PassiveDataService : PassiveListenerService() {
 
-    private lateinit var repository: PassiveDataRepository
+    @Inject
+    lateinit var repository: PassiveDataRepository
 
     override fun onNewDataPointsReceived(dataPoints: DataPointContainer) {
         // TODO: do something with dataPoints

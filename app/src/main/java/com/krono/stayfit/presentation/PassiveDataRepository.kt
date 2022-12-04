@@ -14,15 +14,16 @@ import androidx.health.services.client.data.HeartRateAccuracy.SensorStatus.Compa
 import androidx.health.services.client.data.SampleDataPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 
 //val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_FILENAME)
 
-class PassiveDataRepository (private val context: Context) {
+class PassiveDataRepository @Inject constructor (private val dataStore: DataStore<Preferences>) {
 
     companion object {
         //const val PREFERENCES_FILENAME = "passive_data_prefs"
-        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_FILENAME)
+        //private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_FILENAME)
         private val PASSIVE_DATA_ENABLED = booleanPreferencesKey("passive_data_enabled")
         private val LATEST_HEART_RATE = doublePreferencesKey("latest_heart_rate")
 
@@ -30,23 +31,23 @@ class PassiveDataRepository (private val context: Context) {
     }
 
 
-    val getPassiveDataEnabledFlow: Flow<Boolean> = context.dataStore.data.map { pref ->
+    val getPassiveDataEnabledFlow: Flow<Boolean> = dataStore.data.map { pref ->
         pref[PASSIVE_DATA_ENABLED] ?: false
     }
 
     suspend fun setPassiveDataEnabled(enabled: Boolean) {
-        context.dataStore.edit { pref ->
+        dataStore.edit { pref ->
             pref[PASSIVE_DATA_ENABLED] = enabled
         }
     }
 
 
-    val getLatestHeartRateFlow: Flow<Double> = context.dataStore.data.map { pref ->
+    val getLatestHeartRateFlow: Flow<Double> = dataStore.data.map { pref ->
         pref[LATEST_HEART_RATE] ?: 0.0
     }
 
     suspend fun storeLatestHearRate(heartRate: Double) {
-        context.dataStore.edit { pref ->
+        dataStore.edit { pref ->
             pref[LATEST_HEART_RATE] = heartRate
         }
     }

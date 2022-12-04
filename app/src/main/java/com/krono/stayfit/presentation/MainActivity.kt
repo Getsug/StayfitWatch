@@ -14,11 +14,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -36,6 +38,7 @@ import androidx.health.services.client.data.HeartRateAccuracy.SensorStatus.Compa
 import androidx.health.services.client.data.HeartRateAccuracy.SensorStatus.Companion.ACCURACY_MEDIUM
 import androidx.health.services.client.data.SampleDataPoint
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.material.*
 import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
@@ -43,25 +46,26 @@ import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.krono.stayfit.R
 import com.krono.stayfit.presentation.theme.StayFitTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
-    private  lateinit var repository: PassiveDataRepository
-    private lateinit var healthServicesManager: HealthServicesManager
+//    private  lateinit var repository: PassiveDataRepository
+//    private lateinit var healthServicesManager: HealthServicesManager
 
-
-
+    private val viewModel: MainViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            WearApp()
+            WearApp(viewModel)
 
             requestPermissionLauncher =
                 registerForActivityResult(
@@ -111,12 +115,6 @@ class MainActivity : ComponentActivity() {
 //
 //        }
 
-//        val latestHeartRate = repository.latestHeartRateFlow
-//        val passiveDataEnabled = repository.getPassiveDataEnabledFlow
-//            .distinctUntilChanged()
-//            .onEach { enabled ->
-//
-//            }
 
     }
 
@@ -126,50 +124,46 @@ class MainActivity : ComponentActivity() {
 
         //val requestPermissionLauncher = registerPermissionCallBack()
 
-        //val requestPermissionList = arrayListOf<String>()
+        val requestPermissionList: MutableList<String> = ArrayList()
 
         if(checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             Log.d("ACCESS_FINE_LOCATION", "permission granted")
         }
         else {
             Log.d("ACCESS_FINE_LOCATION", "permission denied")
-            requestPermissionLauncher.launch(
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-                )
-
+            requestPermissionList.add(Manifest.permission.ACCESS_FINE_LOCATION)
         }
+
 
         if(checkPermission(Manifest.permission.ACTIVITY_RECOGNITION)) {
             Log.d("ACTIVITY_RECOGNITION", "permission granted")
         }
         else {
             Log.d("ACTIVITY_RECOGNITION", "permission denied")
-            requestPermissionLauncher.launch(
-                arrayOf(Manifest.permission.ACTIVITY_RECOGNITION)
-            )
-
+            requestPermissionList.add(Manifest.permission.ACTIVITY_RECOGNITION)
         }
+
 
         if(checkPermission(Manifest.permission.BODY_SENSORS)) {
             Log.d("BODY_SENSOR", "permission granted")
         }
         else {
             Log.d("BODY_SENSOR", "permission denied")
-            requestPermissionLauncher.launch(
-                arrayOf(Manifest.permission.BODY_SENSORS)
-            )
-
+            requestPermissionList.add(Manifest.permission.BODY_SENSORS)
         }
+
 
         if(checkPermission(Manifest.permission.FOREGROUND_SERVICE)) {
             Log.d("FOREGROUND_SERVICE", "permission granted")
         }
         else {
             Log.d("FOREGROUND_SERVICE", "permission denied")
-            requestPermissionLauncher.launch(
-                arrayOf(Manifest.permission.FOREGROUND_SERVICE)
-            )
+            requestPermissionList.add(Manifest.permission.FOREGROUND_SERVICE)
+        }
 
+
+        if(requestPermissionList.isNotEmpty()){
+            requestPermissionLauncher.launch(requestPermissionList.toTypedArray())
         }
 
     }
@@ -187,7 +181,11 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun WearApp(){
+fun WearApp(viewModel: MainViewModel){
+
+    //val viewModel: MainViewModel = viewModel()
+
+    val latestHeartRate = viewModel.latestHeartRate.collectAsState(initial = 0)
 
     //var name = MutableState
     //navigation to the app screens
@@ -202,6 +200,14 @@ fun WearApp(){
         }
         composable(route = Screen.Steps.route) {
             StepCounterScreen()
+        }
+        //TODO: display different screen for no heart rate support
+        // TODO: add display screen for passive data disabled
+        composable(route = Screen.Heart.route) {
+            HeartRateScreen(latestHearRate = latestHeartRate.value.toString()) //passive data  enabled screen
+        }
+        composable(route = Screen.Settings.route) {
+            SettingsScreen()
         }
 
     }

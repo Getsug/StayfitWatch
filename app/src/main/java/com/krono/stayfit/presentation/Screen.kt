@@ -10,6 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.Role.Companion.Switch
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,7 +32,8 @@ import com.krono.stayfit.presentation.theme.SubtitleTextColor
 sealed class Screen(val route: String) {
     object Home: Screen(route = "home_screen")
     object Steps: Screen(route = "steps_screen")
-    //object Heart: Screen(route = "heart_screen")
+    object Heart: Screen(route = "heart_screen")
+    object Settings: Screen(route = "settings_screen")
 }
 
 @Composable
@@ -84,8 +89,9 @@ fun HomeScreen(navController: NavController) {
                 }
 
                 item { StepsTakenChip(navController, contentModifier, iconModifier)}
-                item { HeartRateChip(contentModifier, iconModifier) }
+                item { HeartRateChip(navController, contentModifier, iconModifier) }
                 item { BloodOxygenChip(contentModifier, iconModifier) }
+                item { SettingsChip(navController,contentModifier, iconModifier) }
             }
 
         }
@@ -101,10 +107,10 @@ fun StepCounterScreen() {
     //val scope = rememberCoroutineScope()
     //dataStore for passive data
     //TODO changed passive data initialization
-    lateinit var passiveDataRepository: PassiveDataRepository
-
-    //var latestHeartRate by rememberSaveable{ mutableStateOf(0.0) }
-    val latestHeartRate = passiveDataRepository.getLatestHeartRateFlow.collectAsState(initial = 0.0)
+//    lateinit var passiveDataRepository: PassiveDataRepository
+//
+//    //var latestHeartRate by rememberSaveable{ mutableStateOf(0.0) }
+//    val latestHeartRate = passiveDataRepository.getLatestHeartRateFlow.collectAsState(initial = 0.0)
 
     StayFitTheme {
 
@@ -137,7 +143,7 @@ fun StepCounterScreen() {
             Spacer(modifier = Modifier.height(height = 25.dp))
 
             Text(
-                text = latestHeartRate.value.toString(),
+                text = "50",
                 style = TextStyle(
                     fontSize = 32.sp,
                     fontWeight = Bold
@@ -158,6 +164,129 @@ fun StepCounterScreen() {
     }
 
 
+}
+
+
+
+@Composable
+fun HeartRateScreen(latestHearRate: String) {
+
+
+    //TODO changed passive data initialization
+    //var latestHeartRate by rememberSaveable{ mutableListOf<>()}
+
+    StayFitTheme {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            //verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+            Spacer(modifier = Modifier.height(height = 18.dp))
+//            Text(
+//                text = "Steps",
+//                style = TextStyle(
+//                    fontSize = 18.sp,
+//                    fontWeight = Bold
+//                )
+//            )
+
+            Spacer(modifier = Modifier.height(height = 18.dp))
+
+            Image(
+                painter = painterResource(R.drawable.ic_icon_heart_rate ),
+                contentDescription = "Footprint image",
+                modifier = Modifier.size(40.dp)
+            )
+
+            Spacer(modifier = Modifier.height(height = 25.dp))
+
+            Text(
+                text = latestHearRate,
+                style = TextStyle(
+                    fontSize = 32.sp,
+                    fontWeight = Bold
+                ),
+                //color = MaterialTheme.colors.primary
+            )
+
+            Text(
+                text = "bpm",
+                style = TextStyle(
+                    fontSize = 26.sp,
+                    color = SubtitleTextColor
+                ),
+            )
+
+
+        }
+    }
+
+
+}
+
+
+@Composable
+fun SettingsScreen() {
+    StayFitTheme {
+
+        val listState = rememberScalingLazyListState()
+
+        Scaffold(
+            timeText = {
+                if(!listState.isScrollInProgress) {
+                    TimeText()
+                }
+                //TimeText(modifier = Modifier.scrollAway(listState))
+            },
+            vignette = {
+                // Only show a Vignette for scrollable screens. This code lab only has one screen,
+                // which is scrollable, so we show it all the time.
+                Vignette(vignettePosition = VignettePosition.TopAndBottom)
+            },
+            positionIndicator = {
+                PositionIndicator(
+                    scalingLazyListState = listState
+                )
+            }
+        ) {
+
+            // Modifiers used by our Wear composable.
+            val contentModifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+            val iconModifier = Modifier
+                .size(24.dp)
+                .wrapContentSize(align = Alignment.Center)
+
+
+            ScalingLazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                autoCentering = AutoCenteringParams(itemIndex = 0),
+//                contentPadding = PaddingValues(
+//                    top = 32.dp,
+//                    start = 8.dp,
+//                    end = 8.dp,
+//                    bottom = 32.dp
+//                ),
+//                verticalArrangement = Arrangement.Center,
+                state = listState
+            ) {
+                item {
+                    ListHeader {
+                        Text(text = "Settings")
+                    }
+                }
+
+                item { PassiveDataEnabledChip(contentModifier)}
+
+            }
+
+        }
+    }
 }
 
 @Preview(
@@ -188,5 +317,22 @@ fun StepCounterScreenPreview(){
     StayFitTheme {
         //TODO: change paramenter in stepCounter preview
         StepCounterScreen()
+    }
+}
+
+@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Composable
+fun HeartRateScreenPreview(){
+    StayFitTheme {
+        HeartRateScreen(latestHearRate = "64")
+    }
+}
+
+@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Composable
+fun SettingsScreenPreview(){
+    //val viewModel: MainViewModel
+    StayFitTheme {
+        SettingsScreen()
     }
 }

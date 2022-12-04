@@ -5,9 +5,10 @@ import androidx.health.services.client.HealthServices
 import androidx.health.services.client.HealthServicesClient
 import androidx.health.services.client.data.DataType
 import androidx.health.services.client.data.PassiveListenerConfig
+import javax.inject.Inject
 
 
-class HealthServicesManager (healthServicesClient: HealthServicesClient) {
+class HealthServicesManager @Inject constructor (healthServicesClient: HealthServicesClient) {
 
     private val passiveMonitoringClient = healthServicesClient.passiveMonitoringClient
     private val dataTypes = setOf(DataType.HEART_RATE_BPM)
