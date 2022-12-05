@@ -2,26 +2,17 @@ package com.krono.stayfit.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.Role.Companion.Switch
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.core.DataStore
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.wear.compose.material.*
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -229,9 +220,13 @@ fun HeartRateScreen(latestHearRate: String) {
 }
 
 
+//TODO: needs checking
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(viewModel: MainViewModel, passiveDataEnabled: Boolean) {
+//fun SettingsScreen(passiveDataEnabled: Boolean) {
     StayFitTheme {
+
+
 
         val listState = rememberScalingLazyListState()
 
@@ -258,9 +253,9 @@ fun SettingsScreen() {
             val contentModifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)
-            val iconModifier = Modifier
-                .size(24.dp)
-                .wrapContentSize(align = Alignment.Center)
+//            val iconModifier = Modifier
+//                .size(24.dp)
+//                .wrapContentSize(align = Alignment.Center)
 
 
             ScalingLazyColumn(
@@ -281,7 +276,8 @@ fun SettingsScreen() {
                     }
                 }
 
-                item { PassiveDataEnabledChip(contentModifier)}
+                //item { PassiveDataEnabledChip(contentModifier, passiveDataEnabled)}
+                item { PassiveDataEnabledChip(contentModifier, viewModel, passiveDataEnabled)}
 
             }
 
@@ -330,9 +326,14 @@ fun HeartRateScreenPreview(){
 
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
+//fun SettingsScreenPreview(){
+//    StayFitTheme {
+//        SettingsScreen(passiveDataEnabled = true)
+//    }
+//}
 fun SettingsScreenPreview(){
-    //val viewModel: MainViewModel
+    val viewModel: MainViewModel = viewModel()
     StayFitTheme {
-        SettingsScreen()
+        SettingsScreen(viewModel = viewModel, passiveDataEnabled = true)
     }
 }

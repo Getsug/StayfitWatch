@@ -1,6 +1,8 @@
 package com.krono.stayfit.presentation
 
-import androidx.compose.runtime.collectAsState
+import android.content.pm.PackageManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +19,11 @@ class MainViewModel @Inject constructor(
 
 ): ViewModel() {
 
+    private val context = LocalContext
+
     private val _uiState = MutableStateFlow<UiState>(UiState.Startup)
     val uiState: StateFlow<UiState> = _uiState
+
 
     val passiveDataEnabled: Flow<Boolean>
     val latestHeartRate = repository.getLatestHeartRateFlow
@@ -37,10 +42,12 @@ class MainViewModel @Inject constructor(
             .distinctUntilChanged()
             .onEach { enabled ->
                 viewModelScope.launch {
-                    if (enabled)
+                    if (enabled) {
                         healthServicesManager.registerForHeartRateData()
-                    else
+                    }
+                    else{
                         healthServicesManager.unregisterForHeartRateData()
+                    }
                 }
             }
     }

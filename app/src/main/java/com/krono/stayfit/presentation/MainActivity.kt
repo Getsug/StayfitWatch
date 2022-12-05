@@ -15,112 +15,72 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.content.ContextCompat
-import androidx.health.services.client.data.DataType
-import androidx.health.services.client.data.HeartRateAccuracy
-import androidx.health.services.client.data.HeartRateAccuracy.SensorStatus.Companion.ACCURACY_HIGH
-import androidx.health.services.client.data.HeartRateAccuracy.SensorStatus.Companion.ACCURACY_MEDIUM
-import androidx.health.services.client.data.SampleDataPoint
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.wear.compose.material.*
-import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
-import com.krono.stayfit.R
-import com.krono.stayfit.presentation.theme.StayFitTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
-//    private  lateinit var repository: PassiveDataRepository
-//    private lateinit var healthServicesManager: HealthServicesManager
 
     private val viewModel: MainViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContent {
-            WearApp(viewModel)
-
-            requestPermissionLauncher =
-                registerForActivityResult(
-                    ActivityResultContracts.RequestMultiplePermissions()
-                ) { permissions ->
-                    when {
-                        permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                            // Precise location access granted.
-                            //Log.d("ACCESS_FINE_LOCATION", "callback granted")
-                        }
-                        permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                            // Only approximate location access granted.
-                        }
-                        permissions.getOrDefault(Manifest.permission.BODY_SENSORS, false) -> {
-
-                        }
-                        permissions.getOrDefault(Manifest.permission.ACTIVITY_RECOGNITION, false) -> {
-
-                        }
-                        permissions.getOrDefault(Manifest.permission.FOREGROUND_SERVICE, false) -> {
-
-                        }
-                        //else -> {
-                        // no permission granted
-                        //}
-
+        requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestMultiplePermissions()
+            ) { permissions ->
+                when {
+                    permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                        // Precise location access granted.
+                        //Log.d("ACCESS_FINE_LOCATION", "callback granted")
+                    }
+                    permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                        // Only approximate location access granted.
+                    }
+                    permissions.getOrDefault(Manifest.permission.BODY_SENSORS, false) -> {
 
                     }
-                }
+                    permissions.getOrDefault(Manifest.permission.ACTIVITY_RECOGNITION, false) -> {
 
-            StayFitTheme {
-                requestPermission()
+                    }
+                    permissions.getOrDefault(Manifest.permission.FOREGROUND_SERVICE, false) -> {
+
+                    }
+//                    permissions.getOrDefault(Manifest.permission.BACKGROUND, false) -> {
+//
+//                    }
+//                    else -> {
+//                     no permission granted
+//                    }
+
+
+                }
             }
 
-        }
+        /**** Permission handler ****/
+        requestPermission(viewModel)
 
-//        lifecycleScope.launchWhenCreated {
-//            val supportsHeartRate = healthServicesManager.supportsHeartRate()
-//
-//            if(supportsHeartRate){
-//                Log.d("LISTENER_SERVICE", "Registered")
-//                healthServicesManager.registerForHeartRateData()
-//            }else {
-//                Log.d("LISTENER_SERVICE", "Unregistered")
-//                healthServicesManager.unregisterForHeartRateData()
-//            }
-//
-//        }
+        setContent {
+            WearApp(viewModel)
+        }
 
 
     }
 
 
 
-    private fun requestPermission() {
+    private fun requestPermission(viewModel: MainViewModel) {
 
         //val requestPermissionLauncher = registerPermissionCallBack()
 
@@ -146,9 +106,18 @@ class MainActivity : ComponentActivity() {
 
         if(checkPermission(Manifest.permission.BODY_SENSORS)) {
             Log.d("BODY_SENSOR", "permission granted")
+            /*
+            *Permissions are checked each the app is launched
+            * Therefore, once the sensor permission is granted, each launch edits the DataStore
+            * and passiveDataEnabled value is the set to true.
+            * This might reset the the user's settings in cases where passive Data was switched off
+            * */
+            //TODO: find a way to maintain user's passive data setting
+            viewModel.togglePassiveData(true)
         }
         else {
             Log.d("BODY_SENSOR", "permission denied")
+            viewModel.togglePassiveData(false)
             requestPermissionList.add(Manifest.permission.BODY_SENSORS)
         }
 
@@ -186,8 +155,9 @@ fun WearApp(viewModel: MainViewModel){
     //val viewModel: MainViewModel = viewModel()
 
     val latestHeartRate = viewModel.latestHeartRate.collectAsState(initial = 0)
+    val passiveDataEnabled = viewModel.passiveDataEnabled.collectAsState(initial = false)
 
-    //var name = MutableState
+
     //navigation to the app screens
     val navController = rememberSwipeDismissableNavController()
     SwipeDismissableNavHost(
@@ -207,7 +177,9 @@ fun WearApp(viewModel: MainViewModel){
             HeartRateScreen(latestHearRate = latestHeartRate.value.toString()) //passive data  enabled screen
         }
         composable(route = Screen.Settings.route) {
-            SettingsScreen()
+            //TODO: needs checking
+            //SettingsScreen(passiveDataEnabled.value)
+            SettingsScreen(viewModel, passiveDataEnabled.value)
         }
 
     }

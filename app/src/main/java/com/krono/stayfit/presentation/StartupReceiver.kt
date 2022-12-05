@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
-import androidx.health.services.client.HealthServices
 import androidx.hilt.work.HiltWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -44,9 +42,11 @@ class StartupReceiver : BroadcastReceiver() {
                         OneTimeWorkRequestBuilder<RegisterForPassiveDataWorker>().build()
                     )
 
-                } else {
+                }
+                else {
                     // We may have lost the permission somehow. Mark that background data is
                     // disabled so the state is consistent the next time the user opens the app UI.
+                    //TODO: changing passive data is the user's choice. This part should be deleted
                     repository.setPassiveDataEnabled(false)
                 }
 
@@ -61,7 +61,7 @@ class StartupReceiver : BroadcastReceiver() {
 class RegisterForPassiveDataWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
-    private val healthServicesManager: HealthServicesManager
+    private val healthServicesManager: HealthServicesManager,
 ) : Worker(appContext, workerParams) {
 
     override fun doWork(): Result {

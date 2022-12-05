@@ -85,7 +85,10 @@ dependencies {
     implementation "androidx.wear.compose:compose-navigation:$wear_compose_version"
     //Health services
     implementation "androidx.health:health-services-client:$health_services_version"
-    // WorkManager (Kotlin + coroutines)
+    // WorkManager
+    // (Java only)
+    implementation "androidx.work:work-runtime:$work_version"
+    // (Kotlin + coroutines)
     implementation "androidx.work:work-runtime-ktx:$work_version"
     //DataStore
     implementation "androidx.datastore:datastore-preferences-core:$datastore_version"

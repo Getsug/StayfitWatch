@@ -1,12 +1,12 @@
 package com.krono.stayfit.presentation
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Switch
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -15,14 +15,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.wear.compose.material.*
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.krono.stayfit.R
 import com.krono.stayfit.presentation.theme.StayFitTheme
 
-//class ReusableComponents {
-//}
+
 
 
 @Composable
@@ -140,15 +140,25 @@ fun SettingsChip(
 }
 
 
+//TODO: needs checking
 @Composable
 fun PassiveDataEnabledChip(
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel,
+    passiveDataEnabled: Boolean,
+//fun PassiveDataEnabledChip(
+//    modifier: Modifier = Modifier,
+//    passiveDataEnabled: Boolean,
 //    iconModifier: Modifier = Modifier
 
 ) {
+    //val myModel: MainViewModel = viewModel()
+    //TODO: Onchange, save the value  of toggle switch to the dataStore repository
+    //var checked by rememberSaveable { mutableStateOf(passiveDataEnabled)}
+    //val passive = viewModel.passiveDataEnabled.collectAsState(initial = false)
+    //var checked by rememberSaveable { mutableStateOf(passive.value)}
+    var checked = passiveDataEnabled
 
-
-    var checked by rememberSaveable { mutableStateOf(true)}
 
     ToggleChip(
         modifier = modifier,
@@ -167,6 +177,8 @@ fun PassiveDataEnabledChip(
                 checked = checked,
                 onCheckedChange = {
                     checked = it
+                    Log.d(PASSIVE_DATA_TAG, "Changed value of passive data state")
+                    viewModel.togglePassiveData(checked)
                 },
                 modifier = Modifier.semantics {
                     this.contentDescription = if (checked) "Enabled" else "Disabled"
@@ -289,12 +301,16 @@ fun SettingsPreview(navController: NavController = rememberSwipeDismissableNavCo
     showBackground = WEAR_PREVIEW_SHOW_BACKGROUND
 )
 @Composable
-fun PassiveDataEnabledPreview() {
+fun PassiveDataEnabledPreview(passiveDataEnabled: Boolean = true) {
+    val viewModel: MainViewModel = viewModel()
     StayFitTheme {
         PassiveDataEnabledChip(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
+            viewModel = viewModel,
+            passiveDataEnabled
+            //passiveDataEnabled
 //            iconModifier = Modifier
 //                .size(24.dp)
 //                .wrapContentSize(align = Alignment.Center)

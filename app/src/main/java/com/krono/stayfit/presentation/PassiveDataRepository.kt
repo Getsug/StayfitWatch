@@ -1,12 +1,11 @@
 package com.krono.stayfit.presentation
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.preferencesDataStore
+
 import androidx.health.services.client.data.DataType
 import androidx.health.services.client.data.HeartRateAccuracy
 import androidx.health.services.client.data.HeartRateAccuracy.SensorStatus.Companion.ACCURACY_HIGH
@@ -31,6 +30,7 @@ class PassiveDataRepository @Inject constructor (private val dataStore: DataStor
     }
 
 
+    //TODO: change the default value to false
     val getPassiveDataEnabledFlow: Flow<Boolean> = dataStore.data.map { pref ->
         pref[PASSIVE_DATA_ENABLED] ?: false
     }
@@ -52,14 +52,6 @@ class PassiveDataRepository @Inject constructor (private val dataStore: DataStor
         }
     }
 
-//    companion object {
-//        //const val PREFERENCES_FILENAME = "passive_data_prefs"
-//        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_FILENAME)
-//        private val PASSIVE_DATA_ENABLED = booleanPreferencesKey("passive_data_enabled")
-//        private val LATEST_HEART_RATE = doublePreferencesKey("latest_heart_rate")
-//
-//
-//    }
 
 }
 
