@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "573326427539",
+    "firebase_url": "https://stayfit-db-default-rtdb.firebaseio.com",
+    "project_id": "stayfit-db",
+    "storage_bucket": "stayfit-db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573326427539:android:26ac6af54e320ad963d466",
+        "android_client_info": {
+          "package_name": "com.krono.stayfit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "573326427539-h1mpu2o0d2656ctgj0pvo4eboo3bufba.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZ8s2gOZdc6pKuRQ0ytYTHC7LmbO4JA9M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "573326427539-h1mpu2o0d2656ctgj0pvo4eboo3bufba.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
