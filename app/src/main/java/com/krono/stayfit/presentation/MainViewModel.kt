@@ -38,6 +38,7 @@ class MainViewModel @Inject constructor(
         }
 
 
+        //TODO: find a way enable passive data  from the UI
         passiveDataEnabled = repository.getPassiveDataEnabledFlow
             .distinctUntilChanged()
             .onEach { enabled ->
