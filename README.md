@@ -6,4 +6,4 @@ The aim of this project is to develop a WearOS fitness app that has the followin
 - Measure the amount of calories burned.
 - Track water intake.
 ### NOTE
-The project haevily utlizes jetpack compose for WearOs
+The project heavily utlizes jetpack compose for WearOs
