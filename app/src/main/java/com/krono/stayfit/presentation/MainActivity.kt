@@ -154,8 +154,10 @@ fun WearApp(viewModel: MainViewModel){
 
     //val viewModel: MainViewModel = viewModel()
 
-    val latestHeartRate = viewModel.latestHeartRate.collectAsState(initial = 0)
     val passiveDataEnabled = viewModel.passiveDataEnabled.collectAsState(initial = false)
+    val latestHeartRate = viewModel.latestHeartRate.collectAsState(initial = 0)
+    val latestStepsDaily = viewModel.latestStepsDaily.collectAsState(initial = 0L)
+
 
 
     //navigation to the app screens
@@ -169,12 +171,20 @@ fun WearApp(viewModel: MainViewModel){
             HomeScreen(navController)
         }
         composable(route = Screen.Steps.route) {
-            StepCounterScreen()
+            StepCounterScreen(latestStepsDaily = latestStepsDaily.value.toString())
         }
         //TODO: display different screen for no heart rate support
         // TODO: add display screen for passive data disabled
         composable(route = Screen.Heart.route) {
             HeartRateScreen(latestHearRate = latestHeartRate.value.toString()) //passive data  enabled screen
+        }
+        composable(route = Screen.Calories.route) {
+            //CaloriesScreen(latestCalories  = latestHeartRate.value.toString()) //passive data  enabled screen
+            CaloriesScreen(latestCalories  = "120") //passive data  enabled screen
+        }
+        composable(route = Screen.Water.route) {
+            //WaterCountScreen(latestWaterCount = latestHeartRate.value.toString()) //passive data  enabled screen
+            WaterCountScreen(latestWaterCount = "4") //passive data  enabled screen
         }
         composable(route = Screen.Settings.route) {
             //TODO: needs checking

@@ -110,6 +110,58 @@ fun BloodOxygenChip(
 }
 
 @Composable
+fun CaloriesChip(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    iconModifier: Modifier = Modifier
+) {
+    Chip(
+        modifier = modifier,
+        onClick = { /* ... */ },
+        label = {
+            Text(
+                text = "Calories",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        icon = {
+            Icon(
+                painter = painterResource(R.drawable.ic_icon_fire),
+                contentDescription = "checking blood calories",
+                modifier = iconModifier
+            )
+        },
+    )
+}
+
+@Composable
+fun WaterChip(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    iconModifier: Modifier = Modifier
+) {
+    Chip(
+        modifier = modifier,
+        onClick = { /* ... */ },
+        label = {
+            Text(
+                text = "Water",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        icon = {
+            Icon(
+                painter = painterResource(R.drawable.ic_icon_cup),
+                contentDescription = "checking amount of water consumed",
+                modifier = iconModifier
+            )
+        },
+    )
+}
+
+@Composable
 fun SettingsChip(
     navController: NavController,
     modifier: Modifier = Modifier,

@@ -27,7 +27,10 @@ class MainViewModel @Inject constructor(
 
     val passiveDataEnabled: Flow<Boolean>
     val latestHeartRate = repository.getLatestHeartRateFlow
+    val latestStepsDaily = repository.getLatestStepsDailyFlow
 
+
+    //TODO: handle availability and lack of capabilities for HEART_RATE or STEPS_DAILY
     init {
         viewModelScope.launch {
             _uiState.value = if (healthServicesManager.supportsHeartRate()) {
@@ -44,10 +47,14 @@ class MainViewModel @Inject constructor(
             .onEach { enabled ->
                 viewModelScope.launch {
                     if (enabled) {
-                        healthServicesManager.registerForHeartRateData()
+//                        healthServicesManager.registerForHeartRateData()
+//                        healthServicesManager.registerForStepsDaily()
+                        healthServicesManager.registerPassiveData()
                     }
                     else{
-                        healthServicesManager.unregisterForHeartRateData()
+//                        healthServicesManager.unregisterForHeartRateData()
+//                        healthServicesManager.unregisterForStepsDaily()
+                        healthServicesManager.unregisterForPassiveData()
                     }
                 }
             }

@@ -24,6 +24,8 @@ sealed class Screen(val route: String) {
     object Home: Screen(route = "home_screen")
     object Steps: Screen(route = "steps_screen")
     object Heart: Screen(route = "heart_screen")
+    object Calories: Screen(route = "calories_screen")
+    object Water: Screen(route = "water_screen")
     object Settings: Screen(route = "settings_screen")
 }
 
@@ -81,7 +83,9 @@ fun HomeScreen(navController: NavController) {
 
                 item { StepsTakenChip(navController, contentModifier, iconModifier)}
                 item { HeartRateChip(navController, contentModifier, iconModifier) }
-                item { BloodOxygenChip(contentModifier, iconModifier) }
+                //item { BloodOxygenChip(contentModifier, iconModifier) }
+                item { CaloriesChip(navController,contentModifier, iconModifier) }
+                item { WaterChip(navController,contentModifier, iconModifier) }
                 item { SettingsChip(navController,contentModifier, iconModifier) }
             }
 
@@ -90,7 +94,7 @@ fun HomeScreen(navController: NavController) {
 }
 
 @Composable
-fun StepCounterScreen() {
+fun StepCounterScreen(latestStepsDaily: String) {
 
     //context
     //val context = LocalContext.current
@@ -134,7 +138,7 @@ fun StepCounterScreen() {
             Spacer(modifier = Modifier.height(height = 25.dp))
 
             Text(
-                text = "50",
+                text = latestStepsDaily,
                 style = TextStyle(
                     fontSize = 32.sp,
                     fontWeight = Bold
@@ -206,6 +210,128 @@ fun HeartRateScreen(latestHearRate: String) {
 
             Text(
                 text = "bpm",
+                style = TextStyle(
+                    fontSize = 26.sp,
+                    color = SubtitleTextColor
+                ),
+            )
+
+
+        }
+    }
+
+
+}
+
+
+@Composable
+fun CaloriesScreen(latestCalories: String) {
+
+
+    //TODO changed passive data initialization
+    //var latestHeartRate by rememberSaveable{ mutableListOf<>()}
+
+    StayFitTheme {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            //verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+            Spacer(modifier = Modifier.height(height = 18.dp))
+//            Text(
+//                text = "Steps",
+//                style = TextStyle(
+//                    fontSize = 18.sp,
+//                    fontWeight = Bold
+//                )
+//            )
+
+            Spacer(modifier = Modifier.height(height = 18.dp))
+
+            Image(
+                painter = painterResource(R.drawable.ic_icon_fire),
+                contentDescription = "Footprint image",
+                modifier = Modifier.size(40.dp)
+            )
+
+            Spacer(modifier = Modifier.height(height = 25.dp))
+
+            Text(
+                text = latestCalories,
+                style = TextStyle(
+                    fontSize = 32.sp,
+                    fontWeight = Bold
+                ),
+                //color = MaterialTheme.colors.primary
+            )
+
+            Text(
+                text = "kcal",
+                style = TextStyle(
+                    fontSize = 26.sp,
+                    color = SubtitleTextColor
+                ),
+            )
+
+
+        }
+    }
+
+
+}
+
+
+@Composable
+fun WaterCountScreen(latestWaterCount: String) {
+
+
+    //TODO changed passive data initialization
+    //var latestHeartRate by rememberSaveable{ mutableListOf<>()}
+
+    StayFitTheme {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            //verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+            Spacer(modifier = Modifier.height(height = 18.dp))
+//            Text(
+//                text = "Steps",
+//                style = TextStyle(
+//                    fontSize = 18.sp,
+//                    fontWeight = Bold
+//                )
+//            )
+
+            Spacer(modifier = Modifier.height(height = 18.dp))
+
+            Image(
+                painter = painterResource(R.drawable.ic_icon_cup ),
+                contentDescription = "Footprint image",
+                modifier = Modifier.size(40.dp)
+            )
+
+            Spacer(modifier = Modifier.height(height = 25.dp))
+
+            Text(
+                text = latestWaterCount,
+                style = TextStyle(
+                    fontSize = 32.sp,
+                    fontWeight = Bold
+                ),
+                //color = MaterialTheme.colors.primary
+            )
+
+            Text(
+                text = "glasses",
                 style = TextStyle(
                     fontSize = 26.sp,
                     color = SubtitleTextColor
@@ -312,7 +438,7 @@ fun HomeScreenPreview(){
 fun StepCounterScreenPreview(){
     StayFitTheme {
         //TODO: change paramenter in stepCounter preview
-        StepCounterScreen()
+        StepCounterScreen(latestStepsDaily = "50")
     }
 }
 
@@ -321,6 +447,22 @@ fun StepCounterScreenPreview(){
 fun HeartRateScreenPreview(){
     StayFitTheme {
         HeartRateScreen(latestHearRate = "64")
+    }
+}
+
+@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Composable
+fun CaloriesScreenPreview(){
+    StayFitTheme {
+        CaloriesScreen(latestCalories = "120")
+    }
+}
+
+@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Composable
+fun WaterCounterPreview(){
+    StayFitTheme {
+        WaterCountScreen(latestWaterCount = "4")
     }
 }
 

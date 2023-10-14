@@ -33,8 +33,10 @@ class StartupReceiver : BroadcastReceiver() {
         runBlocking {
             if(repository.getPassiveDataEnabledFlow.first()) {
                 val sensorEnabled = context.checkSelfPermission(android.Manifest.permission.BODY_SENSORS)
+                val activityRecognitionEnabled = context.checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION)
 
-                if (sensorEnabled == PackageManager.PERMISSION_GRANTED) {
+                if (sensorEnabled == PackageManager.PERMISSION_GRANTED &&
+                    activityRecognitionEnabled == PackageManager.PERMISSION_GRANTED) {
 
                     // TODO: check more permissions for startup receiver first.
                     Log.d(PASSIVE_DATA_TAG, "Enqueuing worker")
@@ -67,7 +69,9 @@ class RegisterForPassiveDataWorker @AssistedInject constructor(
     override fun doWork(): Result {
         Log.d(PASSIVE_DATA_TAG, "Worker running")
         runBlocking {
-            healthServicesManager.registerForHeartRateData()
+//            healthServicesManager.registerForHeartRateData()
+//            healthServicesManager.registerForStepsDaily()
+            healthServicesManager.registerPassiveData()
 
 //            HealthServices.getClient(appContext)
 //                .passiveMonitoringClient
